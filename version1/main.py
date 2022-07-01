@@ -25,6 +25,8 @@ class MainWindow(QMainWindow):
         self.initUI()               # 界⾯绘制交给InitUi⽅法
         self.initButton()           # 初始化Button
         self.initMenubar()          # 初始化Menubar
+        self.initCombobox()
+        self.initNetwork()
     
     # ---------- 初始化UI界面 ---------- # 
     def initUI(self):
@@ -63,7 +65,7 @@ class MainWindow(QMainWindow):
         print(file_name)
         if file_name != '':
             self.network_file = pd.read_csv(str(file_name)) # 有两列，分别为Name和Neuron_Num
-            print(self.network_file)
+            # print(self.network_file)
             self.generateNetwork()          # 初始化Network
     
     def load_Prompt(self):
@@ -75,14 +77,49 @@ class MainWindow(QMainWindow):
         if file_name != '':
             self.prompt_file = pd.read_csv(str(file_name))
             self.prompt_file = np.array(self.prompt_file.values).flatten()
-            print(self.prompt_file)
-            self.initCombobox()
+            # print(self.prompt_file)
+            self.genergateCombobox()
     
     # ---------- 初始化Combo box ---------- # 
     def initCombobox(self):
         self.ui.Combo_Prompt.clear()
-        for prompt in self.prompt_file:
+        self.default_prompt_file = pd.read_csv('./Prompt_default.csv')
+        self.default_prompt_file = np.array(self.default_prompt_file.values).flatten()
+        self.ui.Combo_Prompt.clear()
+        for prompt in self.default_prompt_file:
             self.ui.Combo_Prompt.addItem(prompt)    # 将获取的Prompt加到Combo box中
+    
+    def initNetwork(self):
+        self.network_file_default = pd.read_csv('./Network_default.csv') # 有两列，分别为Name和Neuron_Num
+        num = self.network_file_default.shape[0]    # 数据行数
+        networkLabels = []
+        connectionLabels = []
+        
+        for i in range(num):
+            networkLabels.append(QLabel())
+            networkLabels[-1].setObjectName(str(self.network_file_default['Name'][i]))
+            networkLabels[-1].setText('Layer:'+str(self.network_file_default['Name'][i])+'  Size:'+str(self.network_file_default['Neuron_Num'][i]))
+            networkLabels[-1].setFont(font_Layer)
+            # networkLabels[-1].setMaximumSize(QtCore.QSize(16777215, 80))
+            networkLabels[-1].setStyleSheet("border-image: url(./pics/pics/border/bk.png);")
+            networkLabels[-1].setAlignment(Qt.AlignCenter)
+            
+            connectionLabels.append(QLabel())
+            connectionLabels[-1].setObjectName('LayerConnection'+str(i))
+            connectionLabels[-1].setText("↑      ↑      ↑      ↑")
+            connectionLabels[-1].setFont(font_connection)
+            connectionLabels[-1].setAlignment(Qt.AlignCenter)
+            
+            self.ui.QVL_NetworkArchitecture.addWidget(networkLabels[-1])
+            self.ui.QVL_NetworkArchitecture.addWidget(connectionLabels[-1])
+        
+        # 设置Layout Stretch, Layer:Connection = 2:1
+        for j in range(num*2):
+            if j % 2 == 0:
+                self.ui.QVL_NetworkArchitecture.setStretch(j,2)
+            else:
+                self.ui.QVL_NetworkArchitecture.setStretch(j,1)
+        
     
     def initMenubar(self):
         self.ui.actionLoad_Neuron_file.triggered.connect(self.load_Neuron)
@@ -100,6 +137,15 @@ class MainWindow(QMainWindow):
         print(prompt)
     
     def generateNetwork(self):
+        # 清理布局里原来的所有控件
+        item_list = list(range(self.ui.QVL_NetworkArchitecture.count()))
+        item_list.reverse()# 倒序删除，避免影响布局顺序
+        for i in item_list:
+            item = self.ui.QVL_NetworkArchitecture.itemAt(i)
+            self.ui.QVL_NetworkArchitecture.removeItem(item)
+            if item.widget():
+                item.widget().deleteLater()
+        # 添加新的控件
         num = self.network_file.shape[0]    # 数据行数
         networkLabels = []
         connectionLabels = []
@@ -128,12 +174,11 @@ class MainWindow(QMainWindow):
                 self.ui.QVL_NetworkArchitecture.setStretch(j,2)
             else:
                 self.ui.QVL_NetworkArchitecture.setStretch(j,1)
-            
         
-        
-
-        
-        
+    def genergateCombobox(self):
+        self.ui.Combo_Prompt.clear()
+        for prompt in self.prompt_file:
+            self.ui.Combo_Prompt.addItem(prompt)    # 将获取的Prompt加到Combo box中
         
 
 class Example(QWidget):
