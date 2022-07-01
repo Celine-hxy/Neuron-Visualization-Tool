@@ -2,7 +2,7 @@
 """
 Created on Thu Jun 29 15:02:08 2022
 
-@author: Celine Huang_黄绣媛
+@author: Celine Huang 黄绣媛
 """
 
 from PyQt5.QtWidgets import *
