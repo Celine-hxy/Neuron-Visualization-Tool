@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="pics">
+    <file>pics/border/background.png</file>
+    <file>pics/border/gk.png</file>
+    <file>pics/border/dark_bk.png</file>
+    <file>pics/neuron/b.png</file>
+    <file>pics/neuron/g.png</file>
+    <file>pics/neuron/o.png</file>
+    <file>pics/neuron/r.png</file>
+    <file>pics/neuron/w.png</file>
+    <file>pics/neuron/y.png</file>
+    <file>pics/border/bk.png</file>
+    <file>pics/border/bk_ffn.png</file>
+    <file>pics/border/ok.png</file>
+    <file>pics/border/ok_sal.png</file>
+    <file>pics/border/xuxian.png</file>
+  </qresource>
+</RCC>
