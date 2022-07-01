@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
         self.initMenubar()          # 初始化Menubar
         self.initCombobox()
         self.initNetwork()
+        self.neuron_file_dir = './Neuron'
     
     # ---------- 初始化UI界面 ---------- # 
     def initUI(self):
@@ -128,9 +129,20 @@ class MainWindow(QMainWindow):
         '''
         按下按键之后获取当前Combo box中的Emotion任务, 在
         '''
-        prompt = self.ui.Combo_Prompt.currentText()
-        print(prompt)
         print(self.neuron_file_dir)
+        prompt = self.ui.Combo_Prompt.currentText()
+        file = f'{self.neuron_file_dir}/{prompt}-all.csv'
+        print(file)
+        activatedNeuron = pd.read_csv(file) 
+        activatedNeuron = np.array(activatedNeuron.values).flatten()
+        allNeuron = np.array(self.NeuronsQLabel).flatten()
+        # activatedNeuron = activatedNeuron.reshape()
+        # print(activatedNeuron)
+        for i in range(len(activatedNeuron)):
+            if activatedNeuron[i]>0:
+                allNeuron[i].setStyleSheet("image: url(./pics/pics/neuron/b.png);")
+                
+                
     
     def generateNetwork(self):
         # 清理布局里原来的所有控件
@@ -191,9 +203,7 @@ class MainWindow(QMainWindow):
                 
         # 添加新的控件
         num = self.network_file.shape[0]    # 数据行数
-        self.LayerQWidget = []              # 一层, 放层名称LayerName(Label) 和 NeuronQWidget(QWidget)
-        self.NeuronQWidget = []
-        self.connectionLabels_n = []
+        self.LayerQWidget = []              # 放一层Neuron
         self.NeuronsQLabel = []
         
         for i in range(num):        # num = Layer数目
@@ -216,14 +226,15 @@ class MainWindow(QMainWindow):
                 NeuronQLabel[-1].setStyleSheet("image: url(./pics/pics/neuron/w.png);")
                 NeuronQLabel[-1].setMaximumSize(QtCore.QSize(100, 100))
                 NeuronQLabel[-1].setMinimumSize(QtCore.QSize(50, 50))
+                # NeuronQLabel[-1].setScaledContents(True)  # 让图片随着QLabel控件大小变化而变化，即自适应
             
             layoutQH = QHBoxLayout()
             for k in NeuronQLabel:
                 layoutQH.addWidget(k)
-  
-            self.LayerQWidget[-1].setLayout(layoutQH)
             
+            self.LayerQWidget[-1].setLayout(layoutQH)
             self.ui.formLayout.addRow(LayerName, self.LayerQWidget[-1])
+            self.NeuronsQLabel.append(NeuronQLabel)
         
         
 
