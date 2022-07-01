@@ -12,6 +12,7 @@ from PyQt5 import uic
 import sys
 import pandas as pd
 import numpy as np
+from fonts import *
 
 
 class MainWindow(QMainWindow):
@@ -41,15 +42,17 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Activated Neurons Visualization Tools')
     
     # ---------- 定义加载函数 ---------- # 
-    def load_csv(self):
+    def load_Neuron(self):
         """
         加载激活的Neuron
         """
         # img_name, _ = QFileDialog.getOpenFileName(self, "打开图片", "", "All Files(*);;*.jpg;;*.png")
         file_name, _ = QFileDialog.getOpenFileName(None, "Open csv file","","All Files(*);;*.csv")
         print(file_name)
-        csv_file = pd.read_csv(str(file_name))
-        print(csv_file)
+        if file_name != '':
+            self.neuron_file = pd.read_csv(str(file_name))
+            self.neuron_file = np.array(self.neuron_file.values).flatten()
+            print(self.neuron_file)
     
     def load_Network(self):
         """
@@ -58,9 +61,10 @@ class MainWindow(QMainWindow):
         # img_name, _ = QFileDialog.getOpenFileName(self, "打开图片", "", "All Files(*);;*.jpg;;*.png")
         file_name, _ = QFileDialog.getOpenFileName(None, "Open csv file","","*.csv;;All Files(*)")          # ;;All Files(*)
         print(file_name)
-        self.csv_file = pd.read_csv(str(file_name))
-        self.csv_file = np.array(self.csv_file.values).flatten()
-        print(self.csv_file)
+        if file_name != '':
+            self.network_file = pd.read_csv(str(file_name)) # 有两列，分别为Name和Neuron_Num
+            print(self.network_file)
+            self.generateNetwork()          # 初始化Network
     
     def load_Prompt(self):
         """
@@ -68,10 +72,11 @@ class MainWindow(QMainWindow):
         """
         file_name, _ = QFileDialog.getOpenFileName(None, "Open csv file","","*.csv;;All Files(*)")          # ;;All Files(*)
         print(file_name)
-        self.prompt_file = pd.read_csv(str(file_name))
-        self.prompt_file = np.array(self.prompt_file.values).flatten()
-        print(self.prompt_file)
-        self.initCombobox()
+        if file_name != '':
+            self.prompt_file = pd.read_csv(str(file_name))
+            self.prompt_file = np.array(self.prompt_file.values).flatten()
+            print(self.prompt_file)
+            self.initCombobox()
     
     # ---------- 初始化Combo box ---------- # 
     def initCombobox(self):
@@ -80,7 +85,7 @@ class MainWindow(QMainWindow):
             self.ui.Combo_Prompt.addItem(prompt)    # 将获取的Prompt加到Combo box中
     
     def initMenubar(self):
-        self.ui.actionLoad_csv_file.triggered.connect(self.load_csv)
+        self.ui.actionLoad_Neuron_file.triggered.connect(self.load_Neuron)
         self.ui.actionLoad_Network.triggered.connect(self.load_Network)
         self.ui.actionLoad_Prompt.triggered.connect(self.load_Prompt)
     
@@ -94,6 +99,41 @@ class MainWindow(QMainWindow):
         prompt = self.ui.Combo_Prompt.currentText()
         print(prompt)
     
+    def generateNetwork(self):
+        num = self.network_file.shape[0]    # 数据行数
+        networkLabels = []
+        connectionLabels = []
+        
+        for i in range(num):
+            networkLabels.append(QLabel())
+            networkLabels[-1].setObjectName(str(self.network_file['Name'][i]))
+            networkLabels[-1].setText('Layer:'+str(self.network_file['Name'][i])+'  Size:'+str(self.network_file['Neuron_Num'][i]))
+            networkLabels[-1].setFont(font_Layer)
+            # networkLabels[-1].setMaximumSize(QtCore.QSize(16777215, 80))
+            networkLabels[-1].setStyleSheet("border-image: url(./pics/pics/border/bk.png);")
+            networkLabels[-1].setAlignment(Qt.AlignCenter)
+            
+            connectionLabels.append(QLabel())
+            connectionLabels[-1].setObjectName('LayerConnection'+str(i))
+            connectionLabels[-1].setText("↑      ↑      ↑      ↑")
+            connectionLabels[-1].setFont(font_connection)
+            connectionLabels[-1].setAlignment(Qt.AlignCenter)
+            
+            self.ui.QVL_NetworkArchitecture.addWidget(networkLabels[-1])
+            self.ui.QVL_NetworkArchitecture.addWidget(connectionLabels[-1])
+        
+        # 设置Layout Stretch, Layer:Connection = 2:1
+        for j in range(num*2):
+            if j % 2 == 0:
+                self.ui.QVL_NetworkArchitecture.setStretch(j,2)
+            else:
+                self.ui.QVL_NetworkArchitecture.setStretch(j,1)
+            
+        
+        
+
+        
+        
         
 
 class Example(QWidget):

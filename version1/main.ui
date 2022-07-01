@@ -94,7 +94,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_2">
+          <widget class="QGroupBox" name="groupBox_NetworkArchitecture">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -112,17 +112,11 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QLabel" name="label">
-              <property name="font">
-               <font>
-                <family>Times New Roman</family>
-                <pointsize>12</pointsize>
-               </font>
+             <layout class="QVBoxLayout" name="QVL_NetworkArchitecture">
+              <property name="spacing">
+               <number>0</number>
               </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -206,12 +200,12 @@
     </property>
     <addaction name="actionLoad_Prompt"/>
     <addaction name="actionLoad_Network"/>
-    <addaction name="actionLoad_csv_file"/>
+    <addaction name="actionLoad_Neuron_file"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionLoad_csv_file">
+  <action name="actionLoad_Neuron_file">
    <property name="text">
     <string>3. Load Neuron</string>
    </property>
