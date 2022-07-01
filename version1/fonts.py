@@ -14,3 +14,7 @@ font_Layer = QtGui.QFont()
 font_Layer.setFamily("Times New Roman")
 font_Layer.setPointSize(12)
 # font_Layer.setBold(True)
+
+font_LayerName = QtGui.QFont()
+font_LayerName.setFamily("Times New Roman")
+font_LayerName.setPointSize(12)

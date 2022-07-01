@@ -46,19 +46,14 @@ class MainWindow(QMainWindow):
     # ---------- 定义加载函数 ---------- # 
     def load_Neuron(self):
         """
-        加载激活的Neuron
+        加载存放激活Neuron的文件夹
         """
-        # img_name, _ = QFileDialog.getOpenFileName(self, "打开图片", "", "All Files(*);;*.jpg;;*.png")
-        file_name, _ = QFileDialog.getOpenFileName(None, "Open csv file","","All Files(*);;*.csv")
-        print(file_name)
-        if file_name != '':
-            self.neuron_file = pd.read_csv(str(file_name))
-            self.neuron_file = np.array(self.neuron_file.values).flatten()
-            print(self.neuron_file)
+        self.neuron_file_dir = QFileDialog.getExistingDirectory() 
+        print(self.neuron_file_dir)
     
     def load_Network(self):
         """
-        加载Network, 将模型的构架显示在UI界面的左下角
+        加载Network, 将模型的构架显示在UI界面的左下角, 并调用显示Network函数
         """
         # img_name, _ = QFileDialog.getOpenFileName(self, "打开图片", "", "All Files(*);;*.jpg;;*.png")
         file_name, _ = QFileDialog.getOpenFileName(None, "Open csv file","","*.csv;;All Files(*)")          # ;;All Files(*)
@@ -66,7 +61,8 @@ class MainWindow(QMainWindow):
         if file_name != '':
             self.network_file = pd.read_csv(str(file_name)) # 有两列，分别为Name和Neuron_Num
             # print(self.network_file)
-            self.generateNetwork()          # 初始化Network
+            self.generateNetwork()          # 显示Network
+            self.generateNeuron()           # 根据Network架构生成Neuron
     
     def load_Prompt(self):
         """
@@ -119,8 +115,7 @@ class MainWindow(QMainWindow):
                 self.ui.QVL_NetworkArchitecture.setStretch(j,2)
             else:
                 self.ui.QVL_NetworkArchitecture.setStretch(j,1)
-        
-    
+         
     def initMenubar(self):
         self.ui.actionLoad_Neuron_file.triggered.connect(self.load_Neuron)
         self.ui.actionLoad_Network.triggered.connect(self.load_Network)
@@ -135,6 +130,7 @@ class MainWindow(QMainWindow):
         '''
         prompt = self.ui.Combo_Prompt.currentText()
         print(prompt)
+        print(self.neuron_file_dir)
     
     def generateNetwork(self):
         # 清理布局里原来的所有控件
@@ -179,6 +175,56 @@ class MainWindow(QMainWindow):
         self.ui.Combo_Prompt.clear()
         for prompt in self.prompt_file:
             self.ui.Combo_Prompt.addItem(prompt)    # 将获取的Prompt加到Combo box中
+
+    def generateNeuron(self):
+        print(self.network_file)
+        
+        # 清理布局里原来的所有控件
+        item_list = list(range(self.ui.formLayout.count()))
+        item_list.reverse()# 倒序删除，避免影响布局顺序
+        for i in item_list:
+            item = self.ui.formLayout.itemAt(i)
+            self.ui.formLayout.removeItem(item)
+            if item.widget():
+                item.widget().deleteLater()
+                
+                
+        # 添加新的控件
+        num = self.network_file.shape[0]    # 数据行数
+        self.LayerQWidget = []              # 一层, 放层名称LayerName(Label) 和 NeuronQWidget(QWidget)
+        self.NeuronQWidget = []
+        self.connectionLabels_n = []
+        self.NeuronsQLabel = []
+        
+        for i in range(num):        # num = Layer数目
+            # Layer名字放入formLayout中
+            # 展示的部件列表
+            LayerName = QLabel()
+            LayerName.setText(str(self.network_file['Name'][i]))
+            LayerName.setFont(font_LayerName)
+            LayerName.setAlignment(Qt.AlignCenter)
+            
+            # 层layer初始化
+            self.LayerQWidget.append(QWidget())
+            self.LayerQWidget[-1].setObjectName('LayerQWidget_'+str(i))
+            self.LayerQWidget[-1].setStyleSheet("background-color: rgb(222, 235, 247);")
+            
+            NeuronQLabel = []
+            for k in range(self.network_file['Neuron_Num'][i]):     # 当前Layer的Neuron数目
+                NeuronQLabel.append(QLabel())
+                NeuronQLabel[-1].setObjectName('Neuron_'+str(i)+str(k))
+                NeuronQLabel[-1].setStyleSheet("image: url(./pics/pics/neuron/w.png);")
+                NeuronQLabel[-1].setMaximumSize(QtCore.QSize(100, 100))
+                NeuronQLabel[-1].setMinimumSize(QtCore.QSize(50, 50))
+            
+            layoutQH = QHBoxLayout()
+            for k in NeuronQLabel:
+                layoutQH.addWidget(k)
+  
+            self.LayerQWidget[-1].setLayout(layoutQH)
+            
+            self.ui.formLayout.addRow(LayerName, self.LayerQWidget[-1])
+        
         
 
 class Example(QWidget):
